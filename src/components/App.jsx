@@ -7,14 +7,22 @@ import Wrapper from './Wrapper/Wrapper';
 
 class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', tel: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', tel: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', tel: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', tel: '227-91-26' },
-    ],
+    contacts: [],
     filter: '',
   };
+
+  componentDidMount() {
+    const savedContacts = localStorage.getItem('contacts');
+    if (savedContacts) {
+      this.setState({ contacts: JSON.parse(savedContacts) });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
 
   addContact = event => {
     const contact = {
@@ -23,13 +31,17 @@ class App extends Component {
       tel: event.tel,
     };
 
-    this.state.contacts.some(
+    const existingContact = this.state.contacts.find(
       elem => contact.name.toLowerCase() === elem.name.toLowerCase()
-    )
-      ? alert(`${contact.name} is already in contacts.`)
-      : this.setState(prevState => ({
-          contacts: [contact, ...prevState.contacts],
-        }));
+    );
+
+    if (existingContact) {
+      alert(`${contact.name} is already in contacts.`);
+    } else {
+      this.setState(prevState => ({
+        contacts: [contact, ...prevState.contacts],
+      }));
+    }
   };
 
   changeFilter = event => {
@@ -46,7 +58,7 @@ class App extends Component {
     const { contacts, filter } = this.state;
 
     const filterContacts = contacts.filter(contact =>
-      contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
+      contact.name.toLowerCase().includes(filter.toLowerCase())
     );
 
     return (
