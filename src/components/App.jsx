@@ -31,17 +31,13 @@ class App extends Component {
       tel: event.tel,
     };
 
-    const existingContact = this.state.contacts.find(
+    this.state.contacts.some(
       elem => contact.name.toLowerCase() === elem.name.toLowerCase()
-    );
-
-    if (existingContact) {
-      alert(`${contact.name} is already in contacts.`);
-    } else {
-      this.setState(prevState => ({
-        contacts: [contact, ...prevState.contacts],
-      }));
-    }
+    )
+      ? alert(`${contact.name} is already in contacts.`)
+      : this.setState(prevState => ({
+          contacts: [contact, ...prevState.contacts],
+        }));
   };
 
   changeFilter = event => {
